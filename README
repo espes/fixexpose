@@ -1,0 +1,3 @@
+Makes application expose in Lion not retarded by writing a single byte to Dock.app memory.
+
+Accomplishes what `defaults write com.apple.dock wvous-show-windows-in-other-spaces -bool FALSE` did in Snow Leopard
