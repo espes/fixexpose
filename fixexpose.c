@@ -211,7 +211,7 @@ int main (int argc, char** argv) {
 
     mach_vm_address_t hackOffset;
     if (arch == (CPU_TYPE_X86 | CPU_ARCH_ABI64)) {
-        if (strcmp(dockVersion, "1040.10")) {
+        if (strcmp(dockVersion, "1040.10") == 0) {
             hackOffset = 0x593ed;
         } else if (strcmp(dockVersion, "1040.36") == 0) {
             hackOffset = 0x56afa;
@@ -261,7 +261,7 @@ int main (int argc, char** argv) {
     pointer_t data = (pointer_t)"\6";
     printf("Writing 0x6 to 0x%llx\n", writeAddress);
     if(vm_write(port, writeAddress, data, 1)) {
-        fprintf(stderr, "Can't to Dock memory\n");
+        fprintf(stderr, "Can't write to Dock memory\n");
         task_resume(port);
         exit(1);
     }
