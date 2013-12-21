@@ -209,25 +209,34 @@ int main (int argc, char** argv) {
 
     printf("Dock version is %s\n", dockVersion);
 
+
     mach_vm_address_t hackOffset;
+    mach_vm_size_t hackSize; 
+    pointer_t hackData = 0;
     if (arch == (CPU_TYPE_X86 | CPU_ARCH_ABI64)) {
         if (strcmp(dockVersion, "1040.10") == 0) {
             hackOffset = 0x593ed;
+            hackSize = 1;
+            hackData = (pointer_t)"\x06";
         } else if (strcmp(dockVersion, "1040.36") == 0) {
             hackOffset = 0x56afa;
-        } else {
-            fprintf(stderr, "Dock version not supported\n");
-            exit(1);
+            hackSize = 1;
+            hackData = (pointer_t)"\x06";
+        } else if (strcmp(dockVersion, "1168.8") == 0) {
+            hackOffset = 0x4b8d1;
+            hackSize = 2;
+            hackData = (pointer_t)"\x90\xE9";
         }
     } else if (arch == CPU_TYPE_X86) {
         if (strcmp(dockVersion, "1040.10") == 0) {
             hackOffset = 0x583ab;
-        } else {
-            fprintf(stderr, "Dock version not supported\n");
-            exit(1);
+            hackSize = 1;
+            hackData = (pointer_t)"\x06";
         }
-    } else {
-        fprintf(stderr, "Dock architecture not supported\n");
+    }
+
+    if (!hackData) {
+        fprintf(stderr, "Dock version not supported\n");
         exit(1);        
     }
 
@@ -241,6 +250,7 @@ int main (int argc, char** argv) {
     }
 
     mach_vm_address_t baseAddress = getTaskBaseAddress(port);
+    printf("Base address is 0x%llx\n", baseAddress);
 
     printf("Suspending Dock\n");
     if (task_suspend(port)) {
@@ -250,17 +260,15 @@ int main (int argc, char** argv) {
 
     mach_vm_address_t writeAddress = baseAddress + hackOffset;
 
-    //make the region writeable
     printf("Making 0x%llx writable\n", writeAddress);
-    if (vm_protect(port, writeAddress, 1, 0, VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXECUTE)) {
+    if (vm_protect(port, writeAddress, hackSize, 0, VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXECUTE)) {
         fprintf(stderr, "Can't set Dock memory protection\n");
         task_resume(port);
         exit(1);
     }
 
-    pointer_t data = (pointer_t)"\6";
-    printf("Writing 0x6 to 0x%llx\n", writeAddress);
-    if(vm_write(port, writeAddress, data, 1)) {
+    printf("Writing patch to 0x%llx\n", writeAddress);
+    if(vm_write(port, writeAddress, hackData, hackSize)) {
         fprintf(stderr, "Can't write to Dock memory\n");
         task_resume(port);
         exit(1);

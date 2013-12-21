@@ -1,3 +1,6 @@
-Makes application expose in Lion not retarded by writing a single byte to Dock.app memory.
+Makes application expose in (Mountain) Lion not retarded by patching Dock.app memory.
 
 Accomplishes what `defaults write com.apple.dock wvous-show-windows-in-other-spaces -bool FALSE` did in Snow Leopard
+
+    clang fixexpose.c -framework Foundation -o fixexpose
+    sudo ./fixexpose
