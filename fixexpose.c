@@ -161,11 +161,11 @@ cpu_type_t getProcessArchitecture(pid_t pid) {
 }
 
 mach_vm_address_t getTaskBaseAddress(mach_port_name_t taskPort) {
-    mach_vm_address_t vmoffset;
+    mach_vm_address_t vmoffset = 0;
     mach_vm_size_t vmsize;
     uint32_t nesting_depth = 0;
     struct vm_region_submap_info_64 vbr;
-    mach_msg_type_number_t vbrcount = 16;
+    mach_msg_type_number_t vbrcount = VM_REGION_SUBMAP_INFO_COUNT_64;
     kern_return_t kr;
 
     //assume the first region is the task __text
