@@ -1,4 +1,4 @@
-Makes application expose in (Mountain) Lion not retarded by patching Dock.app memory.
+Makes application expose in (Mountain) Lion work per-space by patching Dock.app memory.
 
 Accomplishes what `defaults write com.apple.dock wvous-show-windows-in-other-spaces -bool FALSE` did in Snow Leopard
 
